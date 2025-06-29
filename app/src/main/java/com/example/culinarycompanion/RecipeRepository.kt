@@ -2,7 +2,13 @@ package com.example.culinarycompanion
 
 import androidx.lifecycle.LiveData
 
+/**
+ * Repository that manages Recipe data operations.
+ */
+
 class RecipeRepository(private val recipeDao: RecipeDao) {
+
+    // LiveData list of all recipes
 
     val allRecipes: LiveData<List<Recipe>> = recipeDao.getAllRecipes()
 

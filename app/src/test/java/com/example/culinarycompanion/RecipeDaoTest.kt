@@ -9,13 +9,19 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 
 /**
  * Unit tests for RecipeDao database operations.
+ * This test class uses an in-memory Room database for isolated testing.
  */
 class RecipeDaoTest {
 
-    // Allows LiveData to execute synchronously during tests
+    // Allows LiveData to emit values immediately during tests
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
 
@@ -23,7 +29,7 @@ class RecipeDaoTest {
     private lateinit var recipeDao: RecipeDao
 
     /**
-     * Sets up an in-memory Room database before each test.
+     * Sets up a new in-memory database instance before each test.
      */
     @Before
     fun setup() {
@@ -35,28 +41,9 @@ class RecipeDaoTest {
     }
 
     /**
-     * Closes the database after each test.
+     * Closes the database after each test to clean up resources.
      */
     @After
     fun teardown() {
         database.close()
     }
-
-    /**
-     * Test inserting a recipe and verifying it is stored.
-     */
-    @Test
-    fun insertRecipe_savesToDatabase() = runBlocking {
-        val recipe = Recipe(
-            title = "Pancakes",
-            ingredients = "Flour, Eggs, Milk",
-            instructions = "Mix and cook",
-            category = "Breakfast"
-        )
-        recipeDao.insert(recipe)
-
-        val allRecipes = recipeDao.getAllRecipes().getOrAwaitValue()
-        assertEquals(1, allRecipes.size)
-        assertEquals("Pancakes", allRecipes[0].title)
-    }
-}

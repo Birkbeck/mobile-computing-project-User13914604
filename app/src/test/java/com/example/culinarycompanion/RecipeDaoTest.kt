@@ -47,3 +47,101 @@ class RecipeDaoTest {
     fun teardown() {
         database.close()
     }
+
+    /**
+     * Test inserting a recipe and verifying it is stored correctly.
+     */
+    @Test
+    fun insertRecipe_savesToDatabase() = runBlocking {
+        // Arrange
+        val recipe = Recipe(
+            title = "Pancakes",
+            ingredients = "Flour, Eggs, Milk",
+            instructions = "Mix and cook",
+            category = "Breakfast"
+        )
+
+        // Act
+        recipeDao.insert(recipe)
+
+        // Assert
+        val allRecipes = recipeDao.getAllRecipes().getOrAwaitValue()
+        assertEquals(1, allRecipes.size)
+        assertEquals("Pancakes", allRecipes[0].title)
+    }
+
+    /**
+     * Test updating a recipe and verifying the updated data is stored.
+     */
+    @Test
+    fun updateRecipe_updatesFields() = runBlocking {
+        // Arrange
+        val recipe = Recipe(
+            title = "Salad",
+            ingredients = "Lettuce",
+            instructions = "Mix",
+            category = "Lunch"
+        )
+        recipeDao.insert(recipe)
+        val inserted = recipeDao.getAllRecipes().getOrAwaitValue().first()
+
+        // Act
+        val updated = inserted.copy(title = "Greek Salad")
+        recipeDao.update(updated)
+
+        // Assert
+        val allRecipes = recipeDao.getAllRecipes().getOrAwaitValue()
+        assertEquals("Greek Salad", allRecipes[0].title)
+    }
+
+    /**
+     * Test deleting a recipe and verifying it is removed.
+     */
+    @Test
+    fun deleteRecipe_removesFromDatabase() = runBlocking {
+        // Arrange
+        val recipe = Recipe(
+            title = "Soup",
+            ingredients = "Water",
+            instructions = "Boil",
+            category = "Dinner"
+        )
+        recipeDao.insert(recipe)
+        val inserted = recipeDao.getAllRecipes().getOrAwaitValue().first()
+
+        // Act
+        recipeDao.delete(inserted)
+
+        // Assert
+        val allRecipes = recipeDao.getAllRecipes().getOrAwaitValue()
+        assertTrue(allRecipes.isEmpty())
+    }
+
+    /**
+     * Test retrieving multiple recipes returns all entries.
+     */
+    @Test
+    fun getAllRecipes_returnsAllRecipes() = runBlocking {
+        // Arrange
+        val recipe1 = Recipe(
+            title = "Pasta",
+            ingredients = "Noodles",
+            instructions = "Cook",
+            category = "Dinner"
+        )
+        val recipe2 = Recipe(
+            title = "Cake",
+            ingredients = "Flour, Sugar",
+            instructions = "Bake",
+            category = "Dessert"
+        )
+        recipeDao.insert(recipe1)
+        recipeDao.insert(recipe2)
+
+        // Act
+        val allRecipes = recipeDao.getAllRecipes().getOrAwaitValue()
+
+        // Assert
+        assertEquals(2, allRecipes.size)
+    }
+}

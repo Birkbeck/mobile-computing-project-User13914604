@@ -9,8 +9,10 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import androidx.lifecycle.LiveData
+
 import androidx.lifecycle.Observer
+import androidx.lifecycle.LiveData
+
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
